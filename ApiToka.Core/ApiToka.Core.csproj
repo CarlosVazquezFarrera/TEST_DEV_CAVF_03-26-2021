@@ -4,4 +4,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="CustomEntities\" />
+    <Folder Include="DTOs\" />
+    <Folder Include="Entites\" />
+    <Folder Include="Interfaces\Repositories\" />
+    <Folder Include="Interfaces\Services\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>
