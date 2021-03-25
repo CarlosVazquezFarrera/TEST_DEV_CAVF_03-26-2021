@@ -24,7 +24,6 @@ namespace ApiToka.Infrastrucure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new TbPersonaFisicaConfiguration());
-
             OnModelCreatingPartial(modelBuilder);
         }
 
