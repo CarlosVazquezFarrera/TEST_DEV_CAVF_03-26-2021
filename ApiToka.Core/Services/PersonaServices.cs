@@ -20,9 +20,9 @@
         #endregion
         private IPersonaRepository _personaRepository;
         private IMapper _mapper;
-        public Task<SimpleResponse> ActualizarPersonaFisica(TbPersonasFisicasDTO personasFisicas)
+        public async Task<SimpleResponse> ActualizarPersonaFisica(TbPersonasFisicasDTO personasFisicas)
         {
-            throw new System.NotImplementedException();
+            return await _personaRepository.ActualizarPersonaFisica(_mapper.Map<TbPersonasFisicas>(personasFisicas));
         }
 
         public async Task<SimpleResponse> BorrarPersonaFisica(int IdPersona)

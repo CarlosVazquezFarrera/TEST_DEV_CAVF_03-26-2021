@@ -74,9 +74,75 @@
             return responseUsuarios;
         }
 
-        public Task<SimpleResponse> ActualizarPersonaFisica(TbPersonasFisicas personasFisicas)
+        public async Task<SimpleResponse> ActualizarPersonaFisica(TbPersonasFisicas personasFisicas)
         {
-            throw new System.NotImplementedException();
+            SimpleResponse simpleResponseAltaUsuario = new SimpleResponse();
+            await this.baseDatos.Database.OpenConnectionAsync();
+            var dbCommand = this.baseDatos.Database.GetDbConnection().CreateCommand();
+            try
+            {
+                #region Paramethers
+                DbParameter idParameter = dbCommand.CreateParameter();
+                idParameter.ParameterName = "IdPersonaFisica";
+                idParameter.Value = personasFisicas.IdPersonaFisica;
+                dbCommand.Parameters.Add(idParameter);
+
+                DbParameter nombreParameter = dbCommand.CreateParameter();
+                nombreParameter.ParameterName = "Nombre";
+                nombreParameter.Value = personasFisicas.Nombre;
+                dbCommand.Parameters.Add(nombreParameter);
+
+                DbParameter apellidoPaternoParameter = dbCommand.CreateParameter();
+                apellidoPaternoParameter.ParameterName = "ApellidoPaterno";
+                apellidoPaternoParameter.Value = personasFisicas.ApellidoPaterno;
+                dbCommand.Parameters.Add(apellidoPaternoParameter);
+
+                DbParameter apellidoMaternoParameter = dbCommand.CreateParameter();
+                apellidoMaternoParameter.ParameterName = "ApellidoMaterno";
+                apellidoMaternoParameter.Value = personasFisicas.ApellidoMaterno;
+                dbCommand.Parameters.Add(apellidoMaternoParameter);
+
+                DbParameter rfcParameter = dbCommand.CreateParameter();
+                rfcParameter.ParameterName = "RFC";
+                rfcParameter.Value = personasFisicas.Rfc;
+                dbCommand.Parameters.Add(rfcParameter);
+
+                DbParameter fechaNacimientoParameter = dbCommand.CreateParameter();
+                fechaNacimientoParameter.ParameterName = "FechaNacimiento";
+                fechaNacimientoParameter.Value = personasFisicas.FechaNacimiento;
+                dbCommand.Parameters.Add(fechaNacimientoParameter);
+
+                DbParameter usuarioAgregaParameter = dbCommand.CreateParameter();
+                usuarioAgregaParameter.ParameterName = "UsuarioAgrega";
+                usuarioAgregaParameter.Value = personasFisicas.UsuarioAgrega;
+                dbCommand.Parameters.Add(usuarioAgregaParameter);
+                #endregion
+
+                dbCommand.CommandText = "sp_ActualizarPersonaFisica";
+                dbCommand.CommandType = CommandType.StoredProcedure;
+
+                DbDataReader resultadoDb = await dbCommand.ExecuteReaderAsync();
+
+                if (resultadoDb.HasRows)
+                {
+                    if (resultadoDb.Read())
+                    {
+                        simpleResponseAltaUsuario.Exito = resultadoDb.GetInt32(0);
+                        simpleResponseAltaUsuario.Mensaje = resultadoDb.GetString(1);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                simpleResponseAltaUsuario.Exito = 0;
+                simpleResponseAltaUsuario.Mensaje = ex.ToString();
+            }
+            finally
+            {
+                await this.baseDatos.Database.CloseConnectionAsync();
+            }
+            return simpleResponseAltaUsuario;
         }
 
         public async Task<SimpleResponse> BorrarPersonaFisica(int IdPersona)
@@ -107,11 +173,6 @@
                         simpleResponseAltaUsuario.Exito = resultadoDb.GetInt32(0);
                         simpleResponseAltaUsuario.Mensaje = resultadoDb.GetString(1);
                     }
-                }
-                else
-                {
-                    simpleResponseAltaUsuario.Exito = 1;
-                    simpleResponseAltaUsuario.Mensaje = "Borrado exitoso";
                 }
 
             }

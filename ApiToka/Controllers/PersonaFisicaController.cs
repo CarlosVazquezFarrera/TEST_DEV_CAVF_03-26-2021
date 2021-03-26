@@ -61,7 +61,7 @@
 
 
         /// <summary>
-        /// Obtiene el usuario en específico con base al Id enviado
+        /// Elimina el usuario en específico con base al Id enviado
         /// </summary>
         /// <param name="IdUsuario"></param>
         /// <returns></returns>
@@ -71,6 +71,20 @@
             try
             {
                 var usuarioResponse = await _personaService.BorrarPersonaFisica(IdPersonaFisica);
+                return Ok(usuarioResponse);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPut("ActualizarPersonaFisica")]
+        public async Task<IActionResult> ActualizarPersonaFisica([FromBody] TbPersonasFisicasDTO personasFisicasDTO)
+        {
+            try
+            {
+                var usuarioResponse = await _personaService.ActualizarPersonaFisica(personasFisicasDTO);
                 return Ok(usuarioResponse);
             }
             catch (Exception)
