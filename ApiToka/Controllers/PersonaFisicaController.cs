@@ -53,7 +53,27 @@
                 var usuarioResponse = await _personaService.RegistrarPersonaFisica(personasFisicasDTO);
                 return Ok(usuarioResponse);
             }
-            catch (Exception es)
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+
+        /// <summary>
+        /// Obtiene el usuario en específico con base al Id enviado
+        /// </summary>
+        /// <param name="IdUsuario"></param>
+        /// <returns></returns>
+        [HttpDelete("BorrarPersonaFisica")]
+        public async Task<IActionResult> BorrarPersonaFisica([FromQuery] int IdPersonaFisica)
+        {
+            try
+            {
+                var usuarioResponse = await _personaService.BorrarPersonaFisica(IdPersonaFisica);
+                return Ok(usuarioResponse);
+            }
+            catch (Exception)
             {
                 return BadRequest();
             }

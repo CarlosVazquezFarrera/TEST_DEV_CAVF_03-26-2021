@@ -24,7 +24,6 @@
         #endregion
 
         #region Métodos
-
         public async Task<Response<List<TbPersonasFisicas>>> ObtenerPersonasFisicas()
         {
             Response<List<TbPersonasFisicas>> responseUsuarios = new Response<List<TbPersonasFisicas>>();
@@ -80,9 +79,52 @@
             throw new System.NotImplementedException();
         }
 
-        public Task<SimpleResponse> BorrarPersonaFisica(int IdPersona)
+        public async Task<SimpleResponse> BorrarPersonaFisica(int IdPersona)
         {
-            throw new System.NotImplementedException();
+            SimpleResponse simpleResponseAltaUsuario = new SimpleResponse();
+           
+            try
+            {
+                await this.baseDatos.Database.OpenConnectionAsync();
+                var dbCommand = this.baseDatos.Database.GetDbConnection().CreateCommand();
+                #region Paramethers
+
+                DbParameter idPersonaFisicaParameter = dbCommand.CreateParameter();
+                idPersonaFisicaParameter.ParameterName = "IdPersonaFisica";
+                idPersonaFisicaParameter.Value = IdPersona;
+                dbCommand.Parameters.Add(idPersonaFisicaParameter);
+                #endregion
+
+                dbCommand.CommandText = "sp_EliminarPersonaFisica";
+                dbCommand.CommandType = CommandType.StoredProcedure;
+
+                DbDataReader resultadoDb = await dbCommand.ExecuteReaderAsync();
+
+                if (resultadoDb.HasRows)
+                {
+                    if (resultadoDb.Read())
+                    {
+                        simpleResponseAltaUsuario.Exito = resultadoDb.GetInt32(0);
+                        simpleResponseAltaUsuario.Mensaje = resultadoDb.GetString(1);
+                    }
+                }
+                else
+                {
+                    simpleResponseAltaUsuario.Exito = 1;
+                    simpleResponseAltaUsuario.Mensaje = "Borrado exitoso";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                simpleResponseAltaUsuario.Exito = 0;
+                simpleResponseAltaUsuario.Mensaje = ex.ToString();
+            }
+            finally
+            {
+                await this.baseDatos.Database.CloseConnectionAsync();
+            }
+            return simpleResponseAltaUsuario;
         }
 
         public async Task<SimpleResponse> RegistrarPersonaFisica(TbPersonasFisicas personasFisicas)
@@ -150,7 +192,7 @@
                 await this.baseDatos.Database.CloseConnectionAsync();
             }
             return simpleResponseAltaUsuario;
-            #endregion
         }
+        #endregion
     }
 }

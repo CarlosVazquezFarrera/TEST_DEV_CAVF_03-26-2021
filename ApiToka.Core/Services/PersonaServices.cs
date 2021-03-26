@@ -25,9 +25,11 @@
             throw new System.NotImplementedException();
         }
 
-        public Task<SimpleResponse> BorrarPersonaFisica(int IdPersona)
+        public async Task<SimpleResponse> BorrarPersonaFisica(int IdPersona)
         {
-            throw new System.NotImplementedException();
+            if (IdPersona == 0)
+                return new SimpleResponse { Exito = 0, Mensaje = "Debe ingresar un Id" };
+            return await _personaRepository.BorrarPersonaFisica(IdPersona);
         }
 
         public async Task<Response<List<TbPersonasFisicasDTO>>> ObtenerPersonasFisicas()
