@@ -7,6 +7,7 @@
     using Microsoft.EntityFrameworkCore;
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Data.Common;
     using System.Threading.Tasks;
     public class PersonaRepository : IPersonaRepository
@@ -33,7 +34,7 @@
                 var dbCommand = this.baseDatos.Database.GetDbConnection().CreateCommand();
 
                 dbCommand.CommandText = "sp_ConsultarUsuarios";
-                dbCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                dbCommand.CommandType = CommandType.StoredProcedure;
 
                 DbDataReader resultadoDb = await dbCommand.ExecuteReaderAsync();
                 responseUsuarios.Data = new List<TbPersonasFisicas>();
@@ -41,11 +42,10 @@
                 {
                     while (resultadoDb.Read())
                     {
-                        responseUsuarios.Data.Add(new TbPersonasFisicas
+                        var Personsa = new TbPersonasFisicas
                         {
                             IdPersonaFisica = resultadoDb.GetInt32(0),
                             FechaRegistro = resultadoDb.GetDateTime(1),
-                            FechaActualizacion = resultadoDb.GetDateTime(2),
                             Nombre = resultadoDb.GetString(3),
                             ApellidoPaterno = resultadoDb.GetString(4),
                             ApellidoMaterno = resultadoDb.GetString(5),
@@ -53,9 +53,15 @@
                             FechaNacimiento = resultadoDb.GetDateTime(7),
                             UsuarioAgrega = resultadoDb.GetInt32(8),
                             Activo = resultadoDb.GetBoolean(9)
-                        });
+                        };
+                        if (!resultadoDb.IsDBNull(2))
+                        {
+                            Personsa.FechaActualizacion = resultadoDb.GetDateTime(2);
+                        }
+
+                        responseUsuarios.Data.Add(Personsa);
                     }
-                    responseUsuarios.Exito = true;
+                    responseUsuarios.Exito = 1;
                 }
             }
             catch (Exception ex)
@@ -79,10 +85,72 @@
             throw new System.NotImplementedException();
         }
 
-        public Task<SimpleResponse> RegistrarPersonaFisica(TbPersonasFisicas personasFisicas)
+        public async Task<SimpleResponse> RegistrarPersonaFisica(TbPersonasFisicas personasFisicas)
         {
-            throw new System.NotImplementedException();
+            SimpleResponse simpleResponseAltaUsuario = new SimpleResponse();
+            await this.baseDatos.Database.OpenConnectionAsync();
+            var dbCommand = this.baseDatos.Database.GetDbConnection().CreateCommand();
+            try
+            {
+                #region Paramethers
+
+                DbParameter nombreParameter = dbCommand.CreateParameter();
+                nombreParameter.ParameterName = "Nombre";
+                nombreParameter.Value = personasFisicas.Nombre;
+                dbCommand.Parameters.Add(nombreParameter);
+
+                DbParameter apellidoPaternoParameter = dbCommand.CreateParameter();
+                apellidoPaternoParameter.ParameterName = "ApellidoPaterno";
+                apellidoPaternoParameter.Value = personasFisicas.ApellidoPaterno;
+                dbCommand.Parameters.Add(apellidoPaternoParameter);
+
+                DbParameter apellidoMaternoParameter = dbCommand.CreateParameter();
+                apellidoMaternoParameter.ParameterName = "ApellidoMaterno";
+                apellidoMaternoParameter.Value = personasFisicas.ApellidoMaterno;
+                dbCommand.Parameters.Add(apellidoMaternoParameter);
+
+                DbParameter rfcParameter = dbCommand.CreateParameter();
+                rfcParameter.ParameterName = "RFC";
+                rfcParameter.Value = personasFisicas.Rfc;
+                dbCommand.Parameters.Add(rfcParameter);
+
+                DbParameter fechaNacimientoParameter = dbCommand.CreateParameter();
+                fechaNacimientoParameter.ParameterName = "FechaNacimiento";
+                fechaNacimientoParameter.Value = personasFisicas.FechaNacimiento;
+                dbCommand.Parameters.Add(fechaNacimientoParameter);
+
+                DbParameter usuarioAgregaParameter = dbCommand.CreateParameter();
+                usuarioAgregaParameter.ParameterName = "UsuarioAgrega";
+                usuarioAgregaParameter.Value = personasFisicas.UsuarioAgrega;
+                dbCommand.Parameters.Add(usuarioAgregaParameter);
+                #endregion
+
+                dbCommand.CommandText = "sp_AgregarPersonaFisica";
+                dbCommand.CommandType = CommandType.StoredProcedure;
+
+                DbDataReader resultadoDb = await dbCommand.ExecuteReaderAsync();
+
+                if (resultadoDb.HasRows)
+                {
+                    if (resultadoDb.Read())
+                    {
+                        simpleResponseAltaUsuario.Exito = resultadoDb.GetInt32(0);
+                        simpleResponseAltaUsuario.Mensaje = resultadoDb.GetString(1);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                simpleResponseAltaUsuario.Exito = 0;
+                simpleResponseAltaUsuario.Mensaje = ex.ToString();
+            }
+            finally
+            {
+                await this.baseDatos.Database.CloseConnectionAsync();
+            }
+            return simpleResponseAltaUsuario;
+            #endregion
         }
-        #endregion
     }
 }

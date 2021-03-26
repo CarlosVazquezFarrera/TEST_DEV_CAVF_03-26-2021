@@ -1,5 +1,6 @@
 ﻿namespace ApiToka.Controllers
 {
+    using ApiToka.Core.DTOs;
     using ApiToka.Core.Interfaces.Services;
     using Microsoft.AspNetCore.Mvc;
     using System;
@@ -37,7 +38,26 @@
             {
                 return BadRequest();
             }
-        } 
+        }
+
+        /// <summary>
+        /// Obtiene el usuario en específico con base al Id enviado
+        /// </summary>
+        /// <param name="IdUsuario"></param>
+        /// <returns></returns>
+        [HttpPost("RegistrarPersonaFisica")]
+        public async Task<IActionResult> AgregarPersonaFisica([FromBody] TbPersonasFisicasDTO personasFisicasDTO)
+        {
+            try
+            {
+                var usuarioResponse = await _personaService.RegistrarPersonaFisica(personasFisicasDTO);
+                return Ok(usuarioResponse);
+            }
+            catch (Exception es)
+            {
+                return BadRequest();
+            }
+        }
         #endregion
     }
 }

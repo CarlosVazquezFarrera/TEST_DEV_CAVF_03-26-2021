@@ -2,6 +2,7 @@
 {
     using ApiToka.Core.CustomEntities;
     using ApiToka.Core.DTOs;
+    using ApiToka.Core.Entites;
     using ApiToka.Core.Interfaces.Repositories;
     using ApiToka.Core.Interfaces.Services;
     using AutoMapper;
@@ -42,9 +43,9 @@
             return responseDTO;
         }
 
-        public Task<SimpleResponse> RegistrarPersonaFisica(TbPersonasFisicasDTO personasFisicas)
+        public async Task<SimpleResponse> RegistrarPersonaFisica(TbPersonasFisicasDTO personasFisicas)
         {
-            throw new System.NotImplementedException();
+            return await _personaRepository.RegistrarPersonaFisica(_mapper.Map<TbPersonasFisicas>(personasFisicas));
         }
     }
 }
