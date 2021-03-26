@@ -44,6 +44,11 @@ namespace ApiToka
                        .AllowAnyMethod();
             }));
 
+            //Formato Json
+            services.AddMvc().AddJsonOptions(options => {
+                options.JsonSerializerOptions.IgnoreNullValues = true;
+            });
+
             services.AddControllers();
         }
 
