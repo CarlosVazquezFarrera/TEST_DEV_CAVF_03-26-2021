@@ -59,7 +59,6 @@
             }
         }
 
-
         /// <summary>
         /// Elimina el usuario en específico con base al Id enviado
         /// </summary>
@@ -78,7 +77,11 @@
                 return BadRequest();
             }
         }
-
+        /// <summary>
+        /// Actualiza la entidad que se ha enviado como parámetro
+        /// </summary>
+        /// <param name="personasFisicasDTO"></param>
+        /// <returns></returns>
         [HttpPut("ActualizarPersonaFisica")]
         public async Task<IActionResult> ActualizarPersonaFisica([FromBody] TbPersonasFisicasDTO personasFisicasDTO)
         {
@@ -92,6 +95,21 @@
                 return BadRequest();
             }
         }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] TbPersonasFisicasDTO personasFisicasDTO)
+        {
+            try
+            {
+                var usuarioResponse = await _personaService.Login(personasFisicasDTO);
+                return Ok(usuarioResponse);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
         #endregion
     }
 }

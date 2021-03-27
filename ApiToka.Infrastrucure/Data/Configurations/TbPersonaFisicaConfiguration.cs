@@ -21,6 +21,10 @@
                 .HasMaxLength(50)
                 .IsUnicode(false);
 
+            builder.Property(e => e.Correo)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+
             builder.Property(e => e.FechaActualizacion).HasColumnType("datetime");
 
             builder.Property(e => e.FechaNacimiento).HasColumnType("date");
@@ -31,6 +35,10 @@
 
             builder.Property(e => e.Nombre)
                 .HasMaxLength(50)
+                .IsUnicode(false);
+
+            builder.Property(e => e.Password)
+                .HasMaxLength(100)
                 .IsUnicode(false);
 
             builder.Property(e => e.Rfc)

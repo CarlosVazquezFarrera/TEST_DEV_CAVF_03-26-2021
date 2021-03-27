@@ -13,5 +13,7 @@
         public DateTime? FechaNacimiento { get; set; }
         public int? UsuarioAgrega { get; set; }
         public bool? Activo { get; set; }
+        public string Correo { get; set; }
+        public string Password { get; set; }
     }
 }

@@ -26,5 +26,11 @@
         /// </summary>
         /// <returns></returns>
         Task<SimpleResponse> RegistrarPersonaFisica(TbPersonasFisicas personasFisicas);
+        /// <summary>
+        /// Valida el usuario que se ha enviado
+        /// </summary>
+        /// <param name="personasFisicas"></param>
+        /// <returns></returns>
+        Task<Response<TbPersonasFisicas>> Login(TbPersonasFisicas personasFisicas);
     }
 }

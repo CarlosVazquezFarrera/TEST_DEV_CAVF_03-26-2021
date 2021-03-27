@@ -2,7 +2,7 @@
 {
     public abstract class ResponseBase
     {
-        public int Exito { get; set; }
+        public bool Exito { get; set; }
         public string Mensaje { get; set; }
     }
 }

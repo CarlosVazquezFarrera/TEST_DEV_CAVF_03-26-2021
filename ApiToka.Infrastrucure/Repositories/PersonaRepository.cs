@@ -4,6 +4,7 @@
     using ApiToka.Core.Entites;
     using ApiToka.Core.Interfaces.Repositories;
     using ApiToka.Infrastrucure.Data;
+    using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
     using System;
     using System.Collections.Generic;
@@ -27,6 +28,7 @@
         public async Task<Response<List<TbPersonasFisicas>>> ObtenerPersonasFisicas()
         {
             Response<List<TbPersonasFisicas>> responseUsuarios = new Response<List<TbPersonasFisicas>>();
+           
             try
             {
                 await this.baseDatos.Database.OpenConnectionAsync();
@@ -51,7 +53,8 @@
                             Rfc = resultadoDb.GetString(6),
                             FechaNacimiento = resultadoDb.GetDateTime(7),
                             UsuarioAgrega = resultadoDb.GetInt32(8),
-                            Activo = resultadoDb.GetBoolean(9)
+                            Activo = resultadoDb.GetBoolean(9),
+                            Correo = resultadoDb.GetString(10)
                         };
                         if (!resultadoDb.IsDBNull(2))
                         {
@@ -60,7 +63,8 @@
 
                         responseUsuarios.Data.Add(Personsa);
                     }
-                    responseUsuarios.Exito = 1;
+                    responseUsuarios.Exito = true;
+                    
                 }
             }
             catch (Exception ex)
@@ -71,6 +75,7 @@
             {
                 await this.baseDatos.Database.CloseConnectionAsync();
             }
+            
             return responseUsuarios;
         }
 
@@ -127,7 +132,7 @@
                 {
                     if (resultadoDb.Read())
                     {
-                        simpleResponseAltaUsuario.Exito = resultadoDb.GetInt32(0);
+                        simpleResponseAltaUsuario.Exito = resultadoDb.GetBoolean(0);
                         simpleResponseAltaUsuario.Mensaje = resultadoDb.GetString(1);
                     }
                 }
@@ -135,7 +140,7 @@
             }
             catch (Exception ex)
             {
-                simpleResponseAltaUsuario.Exito = 0;
+                simpleResponseAltaUsuario.Exito = false;
                 simpleResponseAltaUsuario.Mensaje = ex.ToString();
             }
             finally
@@ -170,7 +175,7 @@
                 {
                     if (resultadoDb.Read())
                     {
-                        simpleResponseAltaUsuario.Exito = resultadoDb.GetInt32(0);
+                        simpleResponseAltaUsuario.Exito = resultadoDb.GetBoolean(0);
                         simpleResponseAltaUsuario.Mensaje = resultadoDb.GetString(1);
                     }
                 }
@@ -178,7 +183,7 @@
             }
             catch (Exception ex)
             {
-                simpleResponseAltaUsuario.Exito = 0;
+                simpleResponseAltaUsuario.Exito = false;
                 simpleResponseAltaUsuario.Mensaje = ex.ToString();
             }
             finally
@@ -237,7 +242,7 @@
                 {
                     if (resultadoDb.Read())
                     {
-                        simpleResponseAltaUsuario.Exito = resultadoDb.GetInt32(0);
+                        simpleResponseAltaUsuario.Exito = resultadoDb.GetBoolean(0);
                         simpleResponseAltaUsuario.Mensaje = resultadoDb.GetString(1);
                     }
                 }
@@ -245,7 +250,7 @@
             }
             catch (Exception ex)
             {
-                simpleResponseAltaUsuario.Exito = 0;
+                simpleResponseAltaUsuario.Exito = false;
                 simpleResponseAltaUsuario.Mensaje = ex.ToString();
             }
             finally
@@ -253,6 +258,68 @@
                 await this.baseDatos.Database.CloseConnectionAsync();
             }
             return simpleResponseAltaUsuario;
+        }
+
+        public async Task<Response<TbPersonasFisicas>> Login(TbPersonasFisicas personasFisicas)
+        {
+            Response<TbPersonasFisicas> simpleResponseLogin = new Response<TbPersonasFisicas>();
+            await this.baseDatos.Database.OpenConnectionAsync();
+            var dbCommand = this.baseDatos.Database.GetDbConnection().CreateCommand();
+            try
+            {
+                #region Paramethers
+                DbParameter correoParameter = dbCommand.CreateParameter();
+                correoParameter.ParameterName = "Correo";
+                correoParameter.Value = personasFisicas.Correo;
+                dbCommand.Parameters.Add(correoParameter);
+
+                DbParameter passwordPaternoParameter = dbCommand.CreateParameter();
+                passwordPaternoParameter.ParameterName = "Password";
+                passwordPaternoParameter.Value = personasFisicas.Password;
+                dbCommand.Parameters.Add(passwordPaternoParameter);
+                #endregion
+
+                dbCommand.CommandText = "sp_Login";
+                dbCommand.CommandType = CommandType.StoredProcedure;
+
+                DbDataReader resultadoDb = await dbCommand.ExecuteReaderAsync();
+                if (resultadoDb.HasRows)
+                {
+                    
+                    if (resultadoDb.Read())
+                    {
+                        simpleResponseLogin.Data = new TbPersonasFisicas {
+                            IdPersonaFisica = resultadoDb.GetInt32(0),
+                            FechaRegistro = resultadoDb.GetDateTime(1),
+                            FechaActualizacion = resultadoDb.IsDBNull(2) ? default : resultadoDb.GetDateTime(2),
+                            Nombre = resultadoDb.GetString(3),
+                            ApellidoPaterno = resultadoDb.GetString(4),
+                            ApellidoMaterno = resultadoDb.GetString(5),
+                            Rfc = resultadoDb.GetString(6),
+                            FechaNacimiento = resultadoDb.GetDateTime(7),
+                            UsuarioAgrega = resultadoDb.GetInt32(8),
+                            Activo = resultadoDb.GetBoolean(9),
+                            Correo = resultadoDb.GetString(10)
+                        };
+                        simpleResponseLogin.Exito = true;
+                    }
+                }
+                else
+                {
+                    simpleResponseLogin.Mensaje = "Usuario y/o contraseña incorrector";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                simpleResponseLogin.Exito = false;
+                simpleResponseLogin.Mensaje = ex.ToString();
+            }
+            finally
+            {
+                await this.baseDatos.Database.CloseConnectionAsync();
+            }
+            return simpleResponseLogin;
         }
         #endregion
     }

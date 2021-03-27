@@ -28,7 +28,7 @@
         public async Task<SimpleResponse> BorrarPersonaFisica(int IdPersona)
         {
             if (IdPersona == 0)
-                return new SimpleResponse { Exito = 0, Mensaje = "Debe ingresar un Id" };
+                return new SimpleResponse { Exito = false, Mensaje = "Debe ingresar un Id" };
             return await _personaRepository.BorrarPersonaFisica(IdPersona);
         }
 
@@ -48,6 +48,17 @@
         public async Task<SimpleResponse> RegistrarPersonaFisica(TbPersonasFisicasDTO personasFisicas)
         {
             return await _personaRepository.RegistrarPersonaFisica(_mapper.Map<TbPersonasFisicas>(personasFisicas));
+        }
+
+        public async Task<Response<TbPersonasFisicasDTO>> Login(TbPersonasFisicasDTO personasFisicasDTO)
+        {
+            var loginResponse = await _personaRepository.Login(_mapper.Map<TbPersonasFisicas>(personasFisicasDTO));
+            Response<TbPersonasFisicasDTO> responseDTO = new Response<TbPersonasFisicasDTO> { 
+                Exito = loginResponse.Exito,
+                Mensaje = loginResponse.Mensaje,
+                Data =  _mapper.Map<TbPersonasFisicasDTO>(loginResponse.Data)
+            };
+            return responseDTO;
         }
     }
 }
